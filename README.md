@@ -589,6 +589,8 @@ Documenting these group assignments and their timestamps was essential for recon
 ### 5.7 Internal Reconnaissance: "Leet" Port Activity on Linux Host
 
 As part of the internal reconnaissance phase, further analysis was carried out on the Linux host **hoth** to identify suspicious network services that may indicate attacker activity. During the investigation, the term "leet" was highlighted in the task. In cybersecurity contexts, "leet" is commonly associated with the numerical value **1337**, derived from "leet-speak" and frequently used by attackers as a non-standard or covert port number.
+![Google sreach of the word LEET](images/figure-25-LEET-meaning.PNG)
+*Figure 25: Google Search of the meaning of the word "leet"*
 
 I searched Osquery logs for any process bound to port 1337, since this 'leet' port number is commonly used by attackers. Since Osquery records detailed system and network telemetry from Linux hosts, it was selected as the most appropriate data source for this analysis.
 
