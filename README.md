@@ -174,7 +174,7 @@ This section describes how the investigation environment was prepared, including
 
 The investigation was conducted on an Ubuntu Linux virtual machine running on VMware [3]. A local installation of Splunk Enterprise was used to replicate a realistic SOC investigation environment. Carrying out the installation locally allowed full control over permissions, indexing behaviour, and ensured that screenshots and timestamps could be captured as evidence of individual work.
 
-![VMware running Ubuntu](images/figure-01-vmware-ubuntu)
+![VMware running Ubuntu](images/figure-01-vmware-ubuntu.PNG)
 *Figure 1: VMware running Ubuntu*
 
 ### 3.2 Splunk Enterprise Installation on Ubuntu
