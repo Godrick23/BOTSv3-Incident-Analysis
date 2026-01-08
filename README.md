@@ -629,26 +629,12 @@ By leveraging contextual knowledge, numerical keyword filtering, and field-speci
 
 ### 5.8 Malicious File Hash Identification
 
-Finally, Sysmon Event ID 1 (Process Creation) logs were examined on Theodore's endpoint to identify a downloaded executable used for network scanning. The suspicious process was launched from a temporary directory and executed scanning commands.
-
-Additionally, Sysmon logs on a Windows endpoint recorded the execution of a network scanning tool (`hdoor.exe`). The command-line arguments indicated scanning behaviour targeting internal network resources. The MD5 hash of this executable was extracted, enabling further threat intelligence enrichment. The corresponding MD5 hash was extracted directly from the Sysmon event:
-
-**MD5 Hash:** `586EF56F4D8963DD546163AC31C865D7`
-
-This phase represents internal reconnaissance and preparation for lateral movement.
-
-![Sysmon event showing execution and hash of scanning tool](images/figure-29-hdoor-hash.PNG)
-*Figure 29: Sysmon event showing execution and hash of scanning tool*
-
----
-### 5.8 Malicious File Hash Identification
-
 To identify malicious tooling used during post-compromise activity, Sysmon process creation logs were analysed on the Windows endpoint FYODOR-L. The objective of this stage was to determine whether any suspicious executables were launched and to extract file hash values that could be used as indicators of compromise.
 
 The investigation began with a broad exploratory search across the botsv3 index to establish baseline activity on the affected host. The host was then filtered to FYODOR-L, followed by narrowing the dataset to Sysmon operational logs, which provide detailed visibility into process execution events.
 
 ![Figure-29-Sysmon-Process-Creation-Logs](images/Figure-29-Sysmon-Process-Creation-Logs.PNG)
-Figure 29: Sysmon Process Creation Logs ![Sysmon event showing execution and hash of scanning tool](images/figure-29-hdoor-hash.PNG)
+Figure 29: Sysmon Process Creation Logs 
 
 ![Figure-30-Sysmon-Process-Creation-Logs-2](images/Figure-30-Sysmon-Process-Creation-Logs-2.PNG)
 Figure 30: Sysmon Process Creation Logs 2
