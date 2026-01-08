@@ -117,7 +117,8 @@ A typical SOC operates using a tiered model, where responsibilities are distribu
 
 ![SOC Tier Responsibilities](images/figure-00-SOC-Tier-Responsibilities.png)
 *Figure 1: SOC Tier Responsibilities*
-
+figure-00-SOC- Tier- Responsibilities.png 
+![VMware running Ubuntu](images/figure-00-SOC-Tier-Responsibilities.png)
 Within the BOTSv3 exercise, the analyst effectively assumes responsibilities spanning Tier 1 and Tier 2, including alert triage, forensic analysis, and incident reconstruction using Splunk.
 
 ### 2.2 Incident Handling Lifecycle in BOTSv3
