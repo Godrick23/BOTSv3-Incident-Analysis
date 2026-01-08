@@ -115,6 +115,8 @@ A typical SOC operates using a tiered model, where responsibilities are distribu
 - **Tier 2 (Incident Responder)**: Conducts deeper investigation, correlates logs across multiple sources, and identifies root cause and attack progression
 - **Tier 3 (Threat Hunter / SOC Engineer)**: Focuses on advanced analysis, detection engineering, threat intelligence enrichment, and long-term defensive improvements
 
+![VMware running Ubuntu](images/figure-00-SOC-Tier-Responsibilities.PNG)
+*Figure 1: SOC Tier Responsibilities*
 Within the BOTSv3 exercise, the analyst effectively assumes responsibilities spanning Tier 1 and Tier 2, including alert triage, forensic analysis, and incident reconstruction using Splunk.
 
 ### 2.2 Incident Handling Lifecycle in BOTSv3
@@ -175,7 +177,7 @@ This section describes how the investigation environment was prepared, including
 The investigation was conducted on an Ubuntu Linux virtual machine running on VMware [3]. A local installation of Splunk Enterprise was used to replicate a realistic SOC investigation environment. Carrying out the installation locally allowed full control over permissions, indexing behaviour, and ensured that screenshots and timestamps could be captured as evidence of individual work.
 
 ![VMware running Ubuntu](images/figure-01-vmware-ubuntu.PNG)
-*Figure 1: VMware running Ubuntu*
+*Figure 2: VMware running Ubuntu*
 
 ### 3.2 Splunk Enterprise Installation on Ubuntu
 
@@ -184,26 +186,26 @@ Splunk Enterprise was installed using the official Linux installation package, f
 First, the Splunk Enterprise download page was accessed, which required logging in with a Splunk account. After authentication, the Linux `.tgz` package was selected, as this version includes all required dependencies and avoids issues encountered with `.deb` or `.rpm` packages.
 
 ![Terminal showing download command](images/figure-02-terminal-download.PNG)
-*Figure 2: Terminal showing download command*
+*Figure 3: Terminal showing download command*
 
 The download link was copied and executed directly at the terminal. Once the download was completed, the installer archive appeared on the desktop. The archive was then extracted using elevated privileges to ensure that Splunk was installed correctly under the `/opt` directory.
 
 After extraction, Splunk was started from the `bin` directory. During the first launch, the licence agreement was accepted, and an administrator username and password were created. The Splunk web interface was then accessed via localhost on port 8000, which is the default Splunk management port.
 
 ![Splunk running on port 8000](images/figure-03-splunk-port-8000.PNG)
-*Figure 3: Splunk running via port 8000*
+*Figure 4: Splunk running via port 8000*
 
 Once logged in successfully, the Splunk dashboard confirmed that the service was running correctly and ready to ingest data.
 
 ![Splunk Dashboard](images/figure-04-splunk-dashboard.PNG)
-*Figure 4: Splunk Dashboard*
+*Figure 5: Splunk Dashboard*
 
 ### 3.3 Loading and Verifying the BOTSv3 Dataset
 
 Following the successful installation of Splunk, the BOTSv3 dataset was loaded into the environment [5]. This dataset simulates a realistic enterprise breach scenario and is used throughout the investigation tasks.
 
 ![BOTSv3 dataset download from GitHub](images/figure-05-botsv3-github.PNG)
-*Figure 5: BOTSv3 dataset download from GitHub*
+*Figure 6: BOTSv3 dataset download from GitHub*
 
 The BOTSv3 dataset was downloaded separately and extracted locally. After extraction, the directory structure was checked to ensure it matched Splunk's expected application format, including `default`, `metadata`, and index configuration folders.
 
@@ -214,7 +216,7 @@ After restarting Splunk, the dataset was verified through the Splunk web interfa
 The total number of indexed events reached **2,083,056**, which matches the expected event count for the BOTSv3 dataset. This confirmed that the data ingestion process was completed successfully and that the environment was ready for investigation.
 
 ![Splunk web interface of BOTSv3 dataset](images/figure-06-splunk-botsv3-interface.PNG)
-*Figure 6: Splunk web interface of BOTSv3 dataset*
+*Figure 7: Splunk web interface of BOTSv3 dataset*
 
 ---
 
@@ -351,7 +353,7 @@ This user agent is highly unusual within a corporate Office 365 environment. It 
 Overall, this stage represents the initial access vector of the attack. By abusing a trusted cloud service such as OneDrive, the attacker was able to introduce a malicious file into the environment in a way that appeared legitimate, setting the foundation for subsequent stages of execution, persistence, and privilege escalation.
 
 ![OneDrive file upload event with suspicious user agent](images/figure-07-onedrive-upload.PNG)
-*Figure 7: OneDrive file upload event with suspicious user agent*
+*Figure 8: OneDrive file upload event with suspicious user agent*
 
 ---
 
@@ -375,15 +377,15 @@ index=botsv3 sourcetype=stream:smtp *alert*
 *[View full query](queries/smtp-malware-detection.spl)*
 
 ![Filtered SMTP events containing security alerts](images/figure-08-smtp-alerts.PNG)
-*Figure 8: Filtered SMTP events containing security alerts*
+*Figure 9: Filtered SMTP events containing security alerts*
 
 This refinement significantly reduced the dataset and highlighted events where attachments had been identified as malicious. From these results, the `attach_filename{}` field was examined, revealing a file named **"Malware Alert Text.txt"**. This file name is indicative of Microsoft Defender's behaviour when malicious attachments are detected and removed before delivery to the user.
 
 ![attach_filename{} revealing a file named "Malware Alert Text.txt"](images/figure-09-malware-alert-filename.PNG)
-*Figure 9: attach_filename{} revealing a file named "Malware Alert Text.txt"*
+*Figure 10: attach_filename{} revealing a file named "Malware Alert Text.txt"*
 
 ![Filtered SMTP events containing file named "Malware Alert Text.txt"](images/figure-10-malware-alert-events.PNG)
-*Figure 10: Filtered SMTP events containing file named "Malware Alert Text.txt"*
+*Figure 11: Filtered SMTP events containing file named "Malware Alert Text.txt"*
 
 Selecting this event and inspecting the raw email content revealed a Base64-encoded block located near the bottom of the event data. This encoded content represents a malware alert message generated by the email security system:
 
@@ -395,10 +397,10 @@ cmFmdC54bHNtCSBXOTdNLkVtcHN0YWdlDQo=
 ```
 
 ![Filtered SMTP events scrolled down](images/figure-11-smtp-scrolled.PNG)
-*Figure 11: Filtered SMTP events containing file named "Malware Alert Text.txt" - Table Scrolled Down*
+*Figure 12: Filtered SMTP events containing file named "Malware Alert Text.txt" - Table Scrolled Down*
 
 ![Base64-encoded malware alert content within Splunk](images/figure-12-base64-encoded.PNG)
-*Figure 12: Base64-encoded malware alert content within Splunk*
+*Figure 13: Base64-encoded malware alert content within Splunk*
 
 To interpret this content, the encoded string was copied and decoded using a Base64 decoding tool. The decoded output clearly confirmed the presence of a malicious macro-enabled attachment:
 
@@ -409,7 +411,7 @@ Frothly-Brewery-Financial-Planning-FY2019-Draft.xlsm    W97M.Empstage
 ```
 
 ![Decoded Base64 output showing original attachment name](images/figure-13-decoded-base64.PNG)
-*Figure 13: Decoded Base64 output showing original attachment name*
+*Figure 14: Decoded Base64 output showing original attachment name*
 
 This decoding step was critical, as Microsoft Defender replaces the original attachment with a generic alert file, meaning the true filename is not immediately visible without decoding the embedded alert content.
 
@@ -437,7 +439,7 @@ index=botsv3 sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational *xls
 *[View full query](queries/sysmon-xlsm-execution.spl)*
 
 ![Sysmon process creation events filtered for .xlsm activity](images/figure-14-sysmon-xlsm.PNG)
-*Figure 14: Sysmon process creation events filtered for .xlsm activity*
+*Figure 15: Sysmon process creation events filtered for .xlsm activity*
 
 This query was designed to identify any process execution events associated with macro-enabled Excel files, as `.xlsm` documents are commonly abused by attackers to execute malicious code. Sorting the results chronologically made it easier to correlate document execution with any subsequent processes launched.
 
@@ -446,7 +448,7 @@ Reviewing the earliest relevant events revealed that the macro-enabled file `Fro
 **HxTsr.exe**
 
 ![Sysmon event showing execution of HxTsr.exe](images/figure-15-hxtsr-execution.PNG)
-*Figure 15: Sysmon event showing execution of HxTsr.exe*
+*Figure 16: Sysmon event showing execution of HxTsr.exe*
 
 Further analysis of the process creation event confirmed a clear parent–child relationship between the Excel document and the newly executed binary. The timing of the events demonstrated that `HxTsr.exe` was launched immediately after the malicious document was opened, strongly indicating that the execution was triggered by the embedded macro.
 
@@ -468,7 +470,7 @@ index=botsv3 host=hoth (adduser OR useradd)
 ```
 
 ![host=hoth event](images/figure-16-hoth-event.PNG)
-*Figure 16: host=hoth event*
+*Figure 17: host=hoth event*
 
 **Refined Splunk Query:**
 ```spl
@@ -477,7 +479,7 @@ index=botsv3 host=hoth (adduser OR useradd) sourcetype="osquery:results"
 *[View full query](queries/osquery-user-creation.spl)*
 
 ![Osquery events showing user account creation on host hoth](images/figure-17-osquery-user-creation.PNG)
-*Figure 17: Osquery events showing user account creation on host hoth*
+*Figure 18: Osquery events showing user account creation on host hoth*
 
 This search returned a small number of relevant events, indicating successful filtering to genuine account creation activity. Examination of the event details confirmed that the command was executed by the root user, as shown by the `username` field and a user identifier (UID) value of 0, which represents full administrative privileges.
 
@@ -501,7 +503,7 @@ useradd -ou tomcat7 -p ilovedavidverve 0 -g 0 -M -N -r -s /bin/bash
 | `-s /bin/bash` | Valid login shell |
 
 ![Osquery log showing full command line with exposed password](images/figure-18-exposed-password.PNG)
-*Figure 18: Osquery log showing full command line with exposed password*
+*Figure 19: Osquery log showing full command line with exposed password*
 
 This command shows that a new account named `tomcat7` was created with root-level privileges. Most notably, the `-p` flag was used to assign a password at the time of account creation. Because Osquery records full command-line execution details, the password was captured in plaintext within the log.
 
@@ -526,7 +528,7 @@ index=botsv3 source=wineventlog:security EventCode=4720
 *[View full query](queries/windows-event-4720.spl)*
 
 ![Splunk results showing Event ID 4720 user creation events](images/figure-19-event-4720.PNG)
-*Figure 19: Splunk results showing Event ID 4720 user creation events*
+*Figure 20: Splunk results showing Event ID 4720 user creation events*
 
 This search ensured that only security-relevant events related to account creation were returned. Examination of the event details revealed a suspicious account creation entry. Within the New Account section of the event, the following details were observed:
 
@@ -535,12 +537,12 @@ This search ensured that only security-relevant events related to account creati
 - **Account Domain:** `FYODOR-L`
 
 ![Splunk results showing user creation events](images/figure-20-user-creation-details.PNG)
-*Figure 20: Splunk results showing user creation events*
+*Figure 21: Splunk results showing user creation events*
 
 The matching Account Name and SAM Account Name confirmed that `svcvnc` was the newly created local user account. The timestamp of the event, **08/19/2018 at 22:08:17**, was reviewed and found to align with the post-compromise activity window, strengthening confidence that this account creation was malicious rather than administrative.
 
 ![Windows Security event showing New Account details for svcvnc](images/figure-21-svcvnc-details.PNG)
-*Figure 21: Windows Security event showing New Account details for svcvnc*
+*Figure 22: Windows Security event showing New Account details for svcvnc*
 
 To reduce noise and improve accuracy, optional filtering techniques such as excluding irrelevant hosts or searching for specific event message text were noted as effective methods for refining results during larger investigations.
 
@@ -563,13 +565,13 @@ index=botsv3 sourcetype=wineventlog:security svcvnc EventCode=4732
 *[View full query](queries/windows-event-4732.spl)*
 
 ![Splunk results showing group membership modification events for svcvnc](images/figure-22-group-membership.PNG)
-*Figure 22: Splunk results showing group membership modification events for svcvnc*
+*Figure 23: Splunk results showing group membership modification events for svcvnc*
 
 ![Splunk results showing svcvnc event for Users](images/figure-23-users-group.PNG)
-*Figure 23: Splunk results showing svcvnc event for Users*
+*Figure 24: Splunk results showing svcvnc event for Users*
 
 ![Splunk results showing svcvnc event for Administrators](images/figure-24-administrators-group.PNG)
-*Figure 24: Splunk results showing svcvnc event for Administrators*
+*Figure 25: Splunk results showing svcvnc event for Administrators*
 
 This query filtered results to only include group assignment activity related to the `svcvnc` account. Examination of the event details revealed that the account was added to multiple local groups shortly after creation. The following group assignments were identified along with their associated timestamps:
 
@@ -590,7 +592,7 @@ Documenting these group assignments and their timestamps was essential for recon
 
 As part of the internal reconnaissance phase, further analysis was carried out on the Linux host **hoth** to identify suspicious network services that may indicate attacker activity. During the investigation, the term "leet" was highlighted in the task. In cybersecurity contexts, "leet" is commonly associated with the numerical value **1337**, derived from "leet-speak" and frequently used by attackers as a non-standard or covert port number.
 ![Google sreach of the word LEET](images/figure-25-LEET-meaning.PNG)
-*Figure 25: Google Search of the meaning of the word "leet"*
+*Figure 26: Google Search of the meaning of the word "leet"*
 
 I searched Osquery logs for any process bound to port 1337, since this 'leet' port number is commonly used by attackers. Since Osquery records detailed system and network telemetry from Linux hosts, it was selected as the most appropriate data source for this analysis.
 
@@ -600,7 +602,7 @@ index=botsv3 1337 sourcetype=*osquery:results*
 ```
 
 ![Initial Osquery search showing multiple events related to "1337"](images/figure-26-osquery-1337.PNG)
-*Figure 26: Initial Osquery search showing multiple events related to "1337"*
+*Figure 27: Initial Osquery search showing multiple events related to "1337"*
 
 As this query returned a high volume of events, the search was refined to focus specifically on open network ports by filtering on the `columns.port` field:
 
@@ -611,7 +613,7 @@ index=botsv3 1337 sourcetype=*osquery:results* "columns.port"=1337
 *[View full query](queries/osquery-port-1337.spl)*
 
 ![Refined search highlighting processes listening on port 1337](images/figure-27-port-1337-refined.PNG)
-*Figure 27: Refined search highlighting processes listening on port 1337*
+*Figure 28: Refined search highlighting processes listening on port 1337*
 
 This refined query significantly reduced noise and allowed for precise identification of the relevant process. Examination of the resulting event revealed that a process was actively listening on port 1337 with the following attributes:
 
@@ -619,7 +621,7 @@ This refined query significantly reduced noise and allowed for precise identific
 - **Timestamp:** `Mon Aug 20 11:55:34 2018`
 
 ![Process ID (PID): 14356](images/figure-28-pid-14356.PNG)
-*Figure 28: Process ID (PID): 14356*
+*Figure 29: Process ID (PID): 14356*
 
 The presence of a service listening on port 1337 is notable, as this port is not typically used by legitimate services in enterprise Linux environments. Its association with "leet" further suggests intentional selection by an attacker, potentially for command-and-control communication or remote access.
 
@@ -634,18 +636,18 @@ To identify malicious tooling used during post-compromise activity, Sysmon proce
 The investigation began with a broad exploratory search across the botsv3 index to establish baseline activity on the affected host. The host was then filtered to FYODOR-L, followed by narrowing the dataset to Sysmon operational logs, which provide detailed visibility into process execution events.
 
 ![Figure-29-Sysmon-Process-Creation-Logs](images/Figure-29-Sysmon-Process-Creation-Logs.PNG)
-Figure 29: Sysmon Process Creation Logs 
+Figure 30: Sysmon Process Creation Logs 
 
 ![Figure-30-Sysmon-Process-Creation-Logs-2](images/Figure-30-Sysmon-Process-Creation-Logs-2.PNG)
-Figure 30: Sysmon Process Creation Logs 2
+Figure 31: Sysmon Process Creation Logs 2
 
 ![Figure-31-Sysmon-Process-Creation-Logs -3](images/Figure-31-Sysmon-Process-Creation-Logs-3.PNG)
-Figure 31: Sysmon Process Creation Logs 3
+Figure 32: Sysmon Process Creation Logs 3
 
 To focus specifically on process creation activity, the search was refined to Sysmon Event ID 1, which records newly created processes. This significantly reduced noise and ensured that only executable launches were examined.
 
 ![Figure 32 – Sysmon EventID 1 Process Creation](images/Figure-32-Sysmon-EventID-1-Process-Creation.PNG)
-Figure 32: Sysmon EventID 1 Process Creation
+Figure 33: Sysmon EventID 1 Process Creation
 
 The following SPL query was used to extract and summarise executed binaries:
 
@@ -655,7 +657,7 @@ index=botsv3 sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" ho
 | sort - count
 
 ![Figure 33 – Executed Images Frequency Analysis](images/Figure-33-Executed-Images-Frequency-Analysis.PNG)
-Figure 33: Executed Images Frequency Analysis
+Figure 34: Executed Images Frequency Analysis
 
 This query parses the Image field from raw Sysmon XML data and counts how frequently each executable was launched. Sorting the results in descending order highlighted binaries that appeared most often, making it easier to spot anomalous or suspicious files.
 
@@ -664,7 +666,7 @@ Review of the results revealed the execution of an unusual binary located in a t
 C:\Windows\Temp\hdoor.exe
 
 ![Figure-34-Suspicious-Executable-hdoor](images/Figure-34-Suspicious-Executable-hdoor.PNG)
-Figure 34: Suspicious Executable hdoor
+Figure 35: Suspicious Executable hdoor
 
 The location of this file is notable, as temporary directories are commonly abused by attackers to store and execute malicious payloads in an attempt to evade detection.
 
@@ -676,10 +678,10 @@ index=botsv3 sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" ho
 | table _time MD5 Hashes
 
 ![Figure-35-Hash-Extraction-hdoor](images/Figure-35-Hash-Extraction-hdoor.PNG)
-Figure 35: Hash Extraction hdoor
+Figure 36: Hash Extraction hdoor
 
 ![Figure-36-MD5-Hash-Extraction-hdoor](images/Figure-36-MD5-Hash-Extraction-hdoor.PNG)
-Figure 36: MD5 Hash Extraction hdoor
+Figure 37: MD5 Hash Extraction hdoor
 
 This analysis confirmed the following MD5 hash for the malicious executable:
 
