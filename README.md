@@ -641,6 +641,71 @@ This phase represents internal reconnaissance and preparation for lateral moveme
 *Figure 29: Sysmon event showing execution and hash of scanning tool*
 
 ---
+### 5.8 Malicious File Hash Identification
+
+To identify malicious tooling used during post-compromise activity, Sysmon process creation logs were analysed on the Windows endpoint FYODOR-L. The objective of this stage was to determine whether any suspicious executables were launched and to extract file hash values that could be used as indicators of compromise.
+
+The investigation began with a broad exploratory search across the botsv3 index to establish baseline activity on the affected host. The host was then filtered to FYODOR-L, followed by narrowing the dataset to Sysmon operational logs, which provide detailed visibility into process execution events.
+
+![Figure-29-Sysmon-Process-Creation-Logs](images/Figure-29-Sysmon-Process-Creation-Logs.PNG)
+Figure 29: Sysmon Process Creation Logs ![Sysmon event showing execution and hash of scanning tool](images/figure-29-hdoor-hash.PNG)
+
+![Figure-30-Sysmon-Process-Creation-Logs-2](images/Figure-30-Sysmon-Process-Creation-Logs-2.PNG)
+Figure 30: Sysmon Process Creation Logs 2
+
+![Figure-31-Sysmon-Process-Creation-Logs -3](images/Figure-31-Sysmon-Process-Creation-Logs-3.PNG)
+Figure 31: Sysmon Process Creation Logs 3
+
+To focus specifically on process creation activity, the search was refined to Sysmon Event ID 1, which records newly created processes. This significantly reduced noise and ensured that only executable launches were examined.
+
+![Figure 32 – Sysmon EventID 1 Process Creation](images/Figure-32-Sysmon-EventID-1-Process-Creation.PNG)
+Figure 32: Sysmon EventID 1 Process Creation
+
+The following SPL query was used to extract and summarise executed binaries:
+
+index=botsv3 sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" host="FYODOR-L" ("EventID>1</EventID>" OR EventCode=1 OR EventID=1)
+| rex field=_raw "Data Name='Image'>(?<Image>[^<]+)"
+| stats count by Image
+| sort - count
+
+![Figure 33 – Executed Images Frequency Analysis](images/Figure-33-Executed-Images-Frequency-Analysis.PNG)
+Figure 33: Executed Images Frequency Analysis
+
+This query parses the Image field from raw Sysmon XML data and counts how frequently each executable was launched. Sorting the results in descending order highlighted binaries that appeared most often, making it easier to spot anomalous or suspicious files.
+
+Review of the results revealed the execution of an unusual binary located in a temporary directory:
+
+C:\Windows\Temp\hdoor.exe
+
+![Figure-34-Suspicious-Executable-hdoor](images/Figure-34-Suspicious-Executable-hdoor.PNG)
+Figure 34: Suspicious Executable hdoor
+
+The location of this file is notable, as temporary directories are commonly abused by attackers to store and execute malicious payloads in an attempt to evade detection.
+
+Once the suspicious executable had been identified, a more targeted search was conducted to extract cryptographic hash information associated with hdoor.exe. The search was refined to include only events referencing this file, and regular expressions were used to extract hash values from the Sysmon Hashes field:
+
+index=botsv3 sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" host="FYODOR-L" EventID=1 hdoor.exe
+| rex field=_raw "Data Name='Hashes'>(?<Hashes>[^<]+)"
+| rex field=Hashes "MD5=(?<MD5>[A-Fa-f0-9]{32})"
+| table _time MD5 Hashes
+
+![Figure-35-Hash-Extraction-hdoor](images/Figure-35-Hash-Extraction-hdoor.PNG)
+Figure 35: Hash Extraction hdoor
+
+![Figure-36-MD5-Hash-Extraction-hdoor](images/Figure-36-MD5-Hash-Extraction-hdoor.PNG)
+Figure 36: MD5 Hash Extraction hdoor
+
+This analysis confirmed the following MD5 hash for the malicious executable:
+
+MD5 Hash: 586EF56F4D8963DD546163AC31C865D7
+
+Timestamp: 2018-08-20 11:43:10
+
+The presence of hdoor.exe, executed from a temporary directory and associated with this hash, strongly indicates the use of a malicious scanning or reconnaissance tool. Extracting the hash enables defenders to enrich the indicator with threat intelligence, block the file across security controls, and search for its presence across other systems.
+
+This phase of the investigation represents internal reconnaissance and preparation for lateral movement, further demonstrating how detailed endpoint telemetry and systematic filtering in Splunk can uncover attacker tooling and intent during post-exploitation activity.
+
+---
 
 ### 5.9 Attack Timeline Reconstruction
 
