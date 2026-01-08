@@ -115,8 +115,9 @@ A typical SOC operates using a tiered model, where responsibilities are distribu
 - **Tier 2 (Incident Responder)**: Conducts deeper investigation, correlates logs across multiple sources, and identifies root cause and attack progression
 - **Tier 3 (Threat Hunter / SOC Engineer)**: Focuses on advanced analysis, detection engineering, threat intelligence enrichment, and long-term defensive improvements
 
-![VMware running Ubuntu](images/figure-00-SOC-Tier-Responsibilities.PNG)
+![SOC Tier Responsibilities](images/figure-00-SOC-Tier-Responsibilities.PNG)
 *Figure 1: SOC Tier Responsibilities*
+
 Within the BOTSv3 exercise, the analyst effectively assumes responsibilities spanning Tier 1 and Tier 2, including alert triage, forensic analysis, and incident reconstruction using Splunk.
 
 ### 2.2 Incident Handling Lifecycle in BOTSv3
