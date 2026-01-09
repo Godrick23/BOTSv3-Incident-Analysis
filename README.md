@@ -788,6 +788,11 @@ Finally, this incident demonstrates the value of correlating multiple data sourc
 
 ## Appendix: Indicators of Compromise (IoCs)
 
+## 🔗 Supporting Evidence
+
+- 📺 YouTube Walkthrough (Unlisted): [https://youtu.be/xupzeWcEtUY]
+- 💻 GitHub Repository: [Link Here]
+
 ### Malicious Files
 
 | Filename | Type | Hash (MD5) | Description |
